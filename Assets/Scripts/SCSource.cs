@@ -3,26 +3,23 @@ using System.Collections;
 
 public class SCSource : MonoBehaviour {
 
-	SCMainServer mainServer;
-	bool mainServerCreated;
-
-	void Start(){
-		mainServer = null;
-		mainServerCreated = false;
-		createMainServer();
-	}
+	private bool serverCreated = false;
+	SCMainServer server;
 
 	void Update(){
-		mainServer.checkForConnections();
+		if(Input.GetKeyDown("c")){
+			createMainServer();
+		}
 	}
 
 	private void createMainServer(){
-		if(mainServerCreated){
-			Debug.Log("Main server has already been created");
+		if(serverCreated){
+			Debug.Log("Main server already created.");
 			return;
 		}
-		mainServerCreated = true;
+		serverCreated = true;
+		Debug.Log("Created the main server.");
 
-		mainServer = new SCMainServer();
+		server = gameObject.AddComponent<SCMainServer>();
 	}
 }

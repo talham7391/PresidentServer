@@ -2,84 +2,83 @@
 using UnityEngine.Networking;
 using UnityEngine.Networking.Types;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
-public class SCMainServer{
+public class SCMainServer : MonoBehaviour{
 
-	private const int PORT = 2461;
+	private struct ReceivedData{
+		public int hostId;
+		public int connectionId;
+		public int channelId;
+		public byte[] buffer;
+		public int bufferSize;
+		public byte error;
+	};
 
-	private int hostId;
-	private int reliableChannel;
+	private const int PORT = 2462;
 
-	public SCMainServer(){
+	private int mHostId;
+	private int mReliableConnectionId;
+
+	private List<int> currentConnectionIds;
+
+	void Start(){
+
+		currentConnectionIds = new List<int>();
 
 		NetworkTransport.Init();
 
 		ConnectionConfig config = new ConnectionConfig();
-		reliableChannel = config.AddChannel(QosType.Reliable);
+		mReliableConnectionId = config.AddChannel(QosType.Reliable);
+		HostTopology topology = new HostTopology(config, 100);
 
-		HostTopology topology = new HostTopology(config, 6);
-		hostId = NetworkTransport.AddHost(topology, PORT);
-
-		Debug.Log("Seems to have been created.");
+		mHostId = NetworkTransport.AddHost(topology, PORT);
 	}
 
-	public void checkForConnections(){
-		int recHostId;
+	void Update(){
+		int hostId;
 		int connectionId;
 		int channelId;
-		byte[] recBuffer = new byte[1024];
+		byte[] buffer = new byte[1024];
 		int bufferSize = 1024;
-		int dataSize;
+		int recBufferSize;
 		byte error;
-		NetworkEventType recData = NetworkTransport.Receive(out recHostId,
-		                                                    out connectionId,
-		                                                    out channelId,
-		                                                    recBuffer,
-		                                                    bufferSize,
-		                                                    out dataSize,
-		                                                    out error);
-		switch(recData){
-		case NetworkEventType.Nothing:
-			break;
-		case NetworkEventType.ConnectEvent:
-			Debug.Log("Someone Connected!");
-			if(recHostId == hostId){
-				Debug.Log("Trying to connect back...");
-				string address;
-				int port;
-				NetworkID network;
-				NodeID dstNode;
-				byte lError;
-				NetworkTransport.GetConnectionInfo(hostId,
-				                                   connectionId,
-				                                   out address,
-				                                   out port,
-				                                   out network,
-				                                   out dstNode,
-				                                   out error);
-				byte fError;
-				NetworkTransport.Connect(hostId, address, port, 0, out fError);
-				Debug.Log("Connection Request Sent.");
-			}
-			break;
-		case NetworkEventType.DataEvent:
-			Debug.Log("Someone sent a message:");
-			string message = shortenString(Encoding.UTF8.GetString(recBuffer));
-			if(message == "hello"){
-				Debug.Log("Inteded message recieved!");
-			}
-			break;
+		NetworkEventType rec = NetworkTransport.Receive(out hostId, out connectionId, out channelId, buffer, bufferSize, out recBufferSize, out error);
+
+		ReceivedData data = new ReceivedData();
+		data.hostId = hostId;
+		data.connectionId = connectionId;
+		data.channelId = channelId;
+		data.buffer = buffer;
+		data.bufferSize = recBufferSize;
+		data.error = error;
+
+		switch(rec){
+		case NetworkEventType.Nothing: break;
+		case NetworkEventType.ConnectEvent: onConnectEvent(ref data); break;
+		case NetworkEventType.DataEvent: onDataEvent(ref data); break;
 		}
 	}
 
-	private string shortenString(string target){
-		int stringLength = target.Length;
-		for(int i = 0; i < stringLength; ++i){
-			if(target[i] == '\0'){
-				return target.Substring(0, i);
-			}
-		}
-		return target;
+	private void onConnectEvent(ref ReceivedData data){
+		Debug.Log("Someone is trying to connect...");
+		connectBack(ref data);
+	}
+
+	private void onDataEvent(ref ReceivedData data){
+
+	}
+
+	private void connectBack(ref ReceivedData data){
+		string address;
+		int port;
+		NetworkID networkId;
+		NodeID nodeId;
+		byte error;
+		NetworkTransport.GetConnectionInfo(data.hostId, data.connectionId, out address, out port, out networkId, out nodeId, out error);
+		byte cError;
+		currentConnectionIds.Add(NetworkTransport.Connect(mHostId, address, port, 0, out cError));
+		Debug.Log("Successfully connected.");
 	}
 }
