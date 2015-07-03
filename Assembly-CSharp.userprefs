@@ -1,9 +1,11 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\SCMainServer.cs">
     <Files>
-      <File FileName="Assets\Scripts\SCMainServer.cs" Line="70" Column="41" />
-      <File FileName="Assets\Scripts\SCSource.cs" Line="29" Column="1" />
+      <File FileName="Assets\Scripts\SCMainServer.cs" Line="106" Column="60" />
+      <File FileName="Assets\Scripts\SCNetworkUtil.cs" Line="11" Column="2" />
+      <File FileName="Assets\Scripts\SCGameLobby.cs" Line="14" Column="20" />
+      <File FileName="Assets\Scripts\SCMessageInfo.cs" Line="7" Column="17" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
