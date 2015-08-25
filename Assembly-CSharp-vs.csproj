@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{E257DDD5-E1C8-6171-3B83-C4A39D10C90E}</ProjectGuid>
+	<ProjectGuid>{31731B67-4F8C-BC8A-20AB-F3C9C7C23A95}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -46,11 +46,14 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\SCGameLobby.cs" />
-     <Compile Include="Assets\Scripts\SCMainServer.cs" />
-     <Compile Include="Assets\Scripts\SCMessageInfo.cs" />
-     <Compile Include="Assets\Scripts\SCNetworkUtil.cs" />
-     <Compile Include="Assets\Scripts\SCSource.cs" />
+     <Compile Include="Assets\Scripts\SCBrain.cs" />
+     <Compile Include="Assets\Scripts\SCCommunicator.cs" />
+     <Compile Include="Assets\Scripts\SCLogic.cs" />
+     <Compile Include="Assets\Scripts\Util\SCCommandBehaviour.cs" />
+     <Compile Include="Assets\Scripts\Util\SCConnectionInfo.cs" />
+     <Compile Include="Assets\Scripts\Util\SCGameInfo.cs" />
+     <Compile Include="Assets\Scripts\Util\SCMessageInfo.cs" />
+     <Compile Include="Assets\Scripts\Util\SCNetworkUtil.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
