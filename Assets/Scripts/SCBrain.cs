@@ -29,7 +29,6 @@ public class SCBrain{
 		commandBehaviours.Add(new SCCommandBehaviour("update_game", onUpdateGameCommand));
 		commandBehaviours.Add(new SCCommandBehaviour("forget_game", onForgetGameCommand));
 		commandBehaviours.Add(new SCCommandBehaviour("request_game", onRequestGameCommand));
-		commandBehaviours.Add(new SCCommandBehaviour("join_game", onJoinGameCommand));
 	}
 
 	public void processMessage(string command, SCMessageInfo info){
@@ -127,27 +126,11 @@ public class SCBrain{
 		}
 		Debug.Log("SCBrain| User requested game created by: " + game.createdByUser);
 		communicator.sendMessageTo(info.fromConnectionId, "request_game_info:" + 
-		                           "user=" + game.createdByUser + "," +
-		                           "pass=" + (game.hasPassword ? "true" : "false"));
-		communicator.disconnectFrom(info.fromConnectionId);
-	}
-	
-	private void onJoinGameCommand(SCMessageInfo info){
-		string user = info.getValue("user");
-		if(user == null){
-			return;
-		}
-
-		SCGameInfo game = SCGameInfo.getGameCreatedByUser(games, user);
-		if(game == null){
-			communicator.sendMessageTo(info.fromConnectionId, "join_game_info:error=game_not_found");
-			return;
-		}
-		Debug.Log("SCBrain| Potential user to join game created by: " + game.createdByUser);
-		communicator.sendMessageTo(info.fromConnectionId, "join_game_info:" + 
+		                           						  "user=" + game.createdByUser + "," +
+		                           						  "pass=" + (game.hasPassword ? "true" : "false") + "," +
+		                           						  "players=" + game.numberOfConnectedPlayers + "," +
 		                           						  "ip=" + game.connectionInfo.getIp() + "," +
 		                           						  "port=" + game.connectionInfo.getPort());
-		communicator.disconnectFrom(info.fromConnectionId);
 	}
 
 	/********************************************************************************************/
@@ -159,6 +142,11 @@ public class SCBrain{
 		communicator.disconnectFrom(game.createdByConnectionId);
 		logic.freeUniqueId(game.createdByUniqueId);
 		games.Remove(game);
+	}
+
+	public void createSampleGame(){
+		Debug.Log("SCBrain| Created a sample game");
+		games.Add(new SCGameInfo("billyha", 40, 500, false, 5, new SCConnectionInfo("random haha", 400003)));
 	}
 
 	/********************************************************************************************/

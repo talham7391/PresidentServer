@@ -22,11 +22,6 @@ public class SCGameInfo{
 		mNumberOfConnectedPlayers = 0;
 		mTotalNumberOfPlayers = totalNumberOfPlayers;
 		mConnectionInfo = connectionInfo;
-		if(hasPassword){
-			Debug.Log("has password");
-		}else{
-			Debug.Log("doesn't have password");
-		}
 	}
 
 	public string createdByUser{

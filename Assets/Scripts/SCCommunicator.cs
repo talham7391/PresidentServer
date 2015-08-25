@@ -51,6 +51,10 @@ public class SCCommunicator : MonoBehaviour {
 	}
 	
 	void Update(){
+		if(Input.GetKeyDown("s")){
+			brain.createSampleGame();
+		}
+
 		int hostId;
 		int connectionId;
 		int channelId;
