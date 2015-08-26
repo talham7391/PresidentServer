@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class SCGameInfo{
+
+	public const int TIME_OUT = 2;
 
 	private string mCreatedByUser;
 	private int mCreatedByConnectionId;
@@ -12,8 +15,11 @@ public class SCGameInfo{
 	private int mNumberOfConnectedPlayers;
 	private int mTotalNumberOfPlayers;
 	private SCConnectionInfo mConnectionInfo;
+	private Action<SCGameInfo> mOnTimeoutCallback;
 
-	public SCGameInfo(string createdByUser, int createdByConnectionId, int createdByUniqueId, bool hasPassword, int totalNumberOfPlayers, SCConnectionInfo connectionInfo){
+	private float timeSinceDisconnect;
+
+	public SCGameInfo(string createdByUser, int createdByConnectionId, int createdByUniqueId, bool hasPassword, int totalNumberOfPlayers, SCConnectionInfo connectionInfo, Action<SCGameInfo> onTimeoutCallback){
 		mCreatedByUser = createdByUser;
 		mCreatedByConnectionId = createdByConnectionId;
 		mCreatedByUniqueId = createdByUniqueId;
@@ -22,6 +28,22 @@ public class SCGameInfo{
 		mNumberOfConnectedPlayers = 0;
 		mTotalNumberOfPlayers = totalNumberOfPlayers;
 		mConnectionInfo = connectionInfo;
+		timeSinceDisconnect = 0;
+		mOnTimeoutCallback = onTimeoutCallback;
+	}
+
+	public void update(float deltaTime){
+		timeSinceDisconnect += deltaTime;
+		if(timeSinceDisconnect >= TIME_OUT){
+			if(mOnTimeoutCallback != null){
+				mOnTimeoutCallback(this);
+				mOnTimeoutCallback = null;
+			}
+		}
+	}
+
+	public void reset(){
+		timeSinceDisconnect = 0;
 	}
 
 	public string createdByUser{

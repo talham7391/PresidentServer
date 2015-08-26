@@ -42,12 +42,14 @@ public class SCBrain{
 	public void processReconnection(int uniqueId, int connectionId){
 		SCGameInfo game = SCGameInfo.getGameCreatedByUniqueId(games, uniqueId);
 		if(game == null){
+			communicator.sendMessageTo(connectionId, "error:on=reconnecting,extra=game_not_found");
 			return;
 		}
 
 		Debug.Log("SCBrain| Game status updated to \"Connected\" created by user: " + game.createdByUser);
 		game.createdByConnectionId = connectionId;
 		game.userDisconnected = false;
+		removeFromUpdater(game);
 	}
 
 	public void processDisconnection(int connectionId){
@@ -58,6 +60,7 @@ public class SCBrain{
 
 		Debug.Log("SCBrain| Game status updated to \"Disconnected\" created by user: " + game.createdByUser);
 		game.userDisconnected = true;
+		addToUpdater(game);
 	}
 
 	/********************************************************************************************/
@@ -90,7 +93,8 @@ public class SCBrain{
 		                         SCNetworkUtil.toInt(uniqueId),
 		                         (hasPassword == "true" ? true : false),
 		                         SCNetworkUtil.toInt(totalPlayers),
-		                         communicator.getConnectionInfo(info.fromConnectionId)));
+		                         communicator.getConnectionInfo(info.fromConnectionId),
+		                         forget));
 	}
 
 	private void onUpdateGameCommand(SCMessageInfo info){
@@ -141,19 +145,25 @@ public class SCBrain{
 		Debug.Log("SCBrain| Forgot game created by user: " + game.createdByUser);
 		communicator.disconnectFrom(game.createdByConnectionId);
 		logic.freeUniqueId(game.createdByUniqueId);
+		removeFromUpdater(game);
 		games.Remove(game);
 	}
 
 	public void createSampleGame(){
 		Debug.Log("SCBrain| Created a sample game");
-		games.Add(new SCGameInfo("billyha", 40, 500, false, 5, new SCConnectionInfo("random haha", 400003)));
+		games.Add(new SCGameInfo("billyha", 40, 500, false, 5, new SCConnectionInfo("random haha", 400003), forget));
 	}
 
 	/********************************************************************************************/
 	/** Bridge Functions ************************************************************************/
 	/********************************************************************************************/
 
-	public int generateUniqueId(){
-		return logic.generateUniqueId();
+	private void addToUpdater(SCGameInfo game){
+		game.reset();
+		communicator.updater.Add(game.update);
+	}
+
+	private void removeFromUpdater(SCGameInfo game){
+		communicator.updater.Remove(game.update);
 	}
 }

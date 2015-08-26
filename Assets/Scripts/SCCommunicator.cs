@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using System.Collections.Generic;
 using System;
 
 public class SCCommunicator : MonoBehaviour {
@@ -33,11 +34,13 @@ public class SCCommunicator : MonoBehaviour {
 	private int mReliableChannelId;
 
 	private SCBrain brain;
+	public List<Action<float>> updater;
 
 	void Start(){
 		init();
 
 		brain = new SCBrain(this);
+		updater = new List<Action<float>>();
 	}
 	
 	private void init(){
@@ -51,9 +54,8 @@ public class SCCommunicator : MonoBehaviour {
 	}
 	
 	void Update(){
-		if(Input.GetKeyDown("s")){
-			brain.createSampleGame();
-		}
+		processInput();
+		processUpdater();
 
 		int hostId;
 		int connectionId;
@@ -72,6 +74,18 @@ public class SCCommunicator : MonoBehaviour {
 		case NetworkEventType.ConnectEvent: onConnectEvent(ref data); break;
 		case NetworkEventType.DataEvent: onDataEvent(ref data); break;
 		case NetworkEventType.DisconnectEvent: onDisconnectEvent(ref data); break;
+		}
+	}
+
+	private void processInput(){
+		if(Input.GetKeyDown("s")){
+			brain.createSampleGame();
+		}
+	}
+
+	private void processUpdater(){
+		for(int i = 0; i < updater.Count; ++i){
+			updater[i](Time.deltaTime);
 		}
 	}
 	
