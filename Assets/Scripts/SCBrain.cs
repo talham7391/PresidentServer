@@ -47,6 +47,7 @@ public class SCBrain{
 		}
 
 		Debug.Log("SCBrain| Game status updated to \"Connected\" created by user: " + game.createdByUser);
+		communicator.sendMessageTo(connectionId, "connected");
 		game.createdByConnectionId = connectionId;
 		game.userDisconnected = false;
 		removeFromUpdater(game);
@@ -106,6 +107,7 @@ public class SCBrain{
 		SCGameInfo game = SCGameInfo.getGameCreatedByConnectionId(games, info.fromConnectionId);
 		int iPlayers = SCNetworkUtil.toInt(players);
 		if(iPlayers == game.totalNumberOfPlayers){
+			Debug.Log("SCBrain| Game is full created by user: " + game.createdByUser);
 			forget(game);
 		}else{
 			Debug.Log("SCBrain| Players updated to " + iPlayers + " for game created by user: " + game.createdByUser);
